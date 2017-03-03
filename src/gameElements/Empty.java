@@ -1,19 +1,17 @@
 package gameElements;
 
 public class Empty implements Square {
+	protected Player player;
+
 	public String toString() {
-		return null;
+		return " ";
 	}
 
-	@Override
 	public Player getPlayer() {
-		// TODO Auto-generated method stub
-		return null;
+		return player;
 	}
 
-	@Override
 	public void setPlayer(Player p) {
-		// TODO Auto-generated method stub
-		
+		player = p;
 	}
 }

@@ -1,19 +1,20 @@
 package gameElements;
 
 public class Rock implements Square {
+	protected Player player;
+
 	public String toString() {
-		return null;
-	}
+		if (player.getNumber()==0) {
+			return "@";
+		} else {
+			return "#";
+		}	}
 
-	@Override
 	public Player getPlayer() {
-		// TODO Auto-generated method stub
-		return null;
+		return player;
 	}
 
-	@Override
 	public void setPlayer(Player p) {
-		// TODO Auto-generated method stub
-		
+		player = p;
 	}
 }
