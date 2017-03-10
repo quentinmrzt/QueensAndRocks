@@ -246,7 +246,6 @@ public class Board {
 				return sol;
 			}
 
-			try{
 			for(Board s: initialState.getSuccessors()) {
 					sol.addAll(depthFirstSearch(s));
 					if(!sol.isEmpty() && sol.get(0).isSolution() ){
@@ -257,8 +256,8 @@ public class Board {
 
 
 			}
-			}catch (NoSuchElementException e){
-				System.err.println("pute");
+			if(sol.isEmpty() && initialState.isEmpty()) {
+				throw new NoSuchElementException();
 			}
 			return sol;
 			
@@ -266,7 +265,7 @@ public class Board {
 		}
 		
 		// question 1.4
-		public ArrayList<Board> depthFirstSearch() {	
+		public ArrayList<Board> depthFirstSearch() {
 			return depthFirstSearch(new Board(size));
 		}
 		
@@ -280,6 +279,7 @@ public class Board {
 					}
 				}	
 			}
+
 			
 			return empty;
 		}
@@ -288,7 +288,7 @@ public class Board {
 		public String solutionSteps(Board b) {
 			StringBuilder s = new StringBuilder();
 			
-			ArrayList<Board> lb = depthFirstSearch(b);
+			ArrayList<Board> lb = b.depthFirstSearch();
 			for(Board bo:lb) {
 				s.append(bo.toString());
 			}
@@ -296,10 +296,164 @@ public class Board {
 			return s.toString();
 		}
 		
-		// question 1.6
+		// question 3.1
+		public ArrayList<Board> getNewSuccessors() {
+			ArrayList<Board> lb = new ArrayList<Board>();
+			int n = this.numberOfQueens()+1;
+			
+			for(int i=0; i<this.size ; i++) {
+				if (isAccessible(n,i)) {
+					Board b = this.clone();
+					b.placeQueen(n, i);
+					lb.add(b);
+				}
+			}
+			return lb;
+		}
+		
+		// question 3.2
+		public ArrayList<Board> depthFirstSearch2(Board initialState) {
+			ArrayList<Board> sol = new ArrayList<Board>();
+			
+			if(initialState.isSolution()) {
+				sol.add(initialState);
+				return sol;
+			}
+
+			for(Board s: initialState.getNewSuccessors()) {
+					sol.addAll(depthFirstSearch(s));
+					if(!sol.isEmpty() && sol.get(0).isSolution() ){
+						sol.add(initialState);
+						return sol;
+					}
+						
+
+
+			}
+			if(sol.isEmpty() && initialState.isEmpty()) {
+				throw new NoSuchElementException();
+			}
+			return sol;
+			
+			
+		}
+		
+		// question 3.2
+		public ArrayList<Board> depthFirstSearch2() {
+			return depthFirstSearch2(new Board(size));
+		}
+		
+		// question 4.1
+		public int[] boardToArray() {
+			int[] tab = new int[size];
+			
+			for (int x=0 ; x<size ; x++) {
+				boolean vide=true;
+				for (int y=0 ; y<size ; y++) {
+					if(!this.isEmpty(x, y) && vide) {
+						tab[x]=y;
+						vide=false;
+					}
+				}
+				if(vide) {
+					tab[x]=-1;
+				}
+			}
+
+			return tab;
+		}
+		
+		// question 4.1
+		public Board arrayToBoard(int[] array) {
+			Board b = new Board(array.length);
+			
+			for (int x=0 ; x<size ; x++) {
+				for (int y=0 ; y<size ; y++) {
+					if(array[x]==y){
+						b.placeQueen(x, y);
+					}
+				}
+			}
+			
+			return b;
+		}
 	
+		// question 4.2
+		public ArrayList<int[]> getArraySuccessors(int[] array) {
+			ArrayList<int[]> lb = new ArrayList<int[]>();
+			Board b = arrayToBoard(array);
+			
+			for (int x=0 ; x<array.length ; x++) {
+				if(array[x]==-1) {
+					for(int y=0 ; y<array.length ; y++) {
+						if(b.isAccessible(x, y)){
+							int[] tmp = array.clone();
+							tmp[x]=y;
+							lb.add(tmp);
+						}
+					}
+				}
+				
+			}
+			
+			return lb;
+		}
+		
+		// question 4.3
+		public boolean isSolutionArray(int[] array) {
+			for (int i: array) {
+				if (i==-1) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		public boolean isEmptyArray(int[] array) {
+			for (int i: array) {
+				if (i!=-1) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		// question 4.4
+		public ArrayList<int[]> depthFirstSearchArray(int[] initialState) {
+			ArrayList<int[]> sol = new ArrayList<int[]>();
+			
+			if(isSolutionArray(initialState)) {
+				sol.add(initialState);
+				return sol;
+			}
+
+			for(int[] i: getArraySuccessors(initialState)) {
+					sol.addAll(depthFirstSearchArray(i));
+					if(!sol.isEmpty() && isSolutionArray(sol.get(0)) ){
+						sol.add(initialState);
+						return sol;
+					}
+						
+
+
+			}
+			if(sol.isEmpty() && isEmptyArray(initialState)) {
+				throw new NoSuchElementException();
+			}
+			return sol;
+		}
 	
-	
+		public ArrayList<int[]> depthFirstSearchArray() {
+			int[] tab = new int[size];
+			for(int i = 0; i <size; i++){
+				tab[i] = -1;
+			}
+			return depthFirstSearchArray(tab);
+		}
+		
+		
 	
 	//------------TP3----------------------
 	public boolean isAccessible2(int i, int j, Player currentPlayer) {

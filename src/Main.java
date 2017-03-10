@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Date;
 
 import gameElements.*;
 import graphics.*;
@@ -33,19 +35,43 @@ public class Main {
 		}
 	}
 	
+	public static void test2() {
+		
+		Scanner sc = new Scanner(System.in);
+		int s;
+		System.out.print("Choisissez une taille du tableau : ");
+		s = sc.nextInt();
+		Board b = new Board(s);
+		
+		System.out.println("Taille : "+b.getSize()+"\n");
+		System.out.print("Board 1 : ");
+		Date date = new Date();
+		b.depthFirstSearch();
+		Date date2 = new Date();
+		System.out.println(date2.getTime()-date.getTime()+" ms");
+		
+		System.out.print("Board 2 : ");
+		date = new Date();
+		b.depthFirstSearch2();
+		date2 = new Date();
+		System.out.println(date2.getTime()-date.getTime()+" ms");
+		
+		System.out.print("Array : ");
+		date = new Date();
+		b.depthFirstSearchArray();
+		date2 = new Date();
+		System.out.println(date2.getTime()-date.getTime()+" ms");
+	}
+	
+	
 	public static void main(String[] args) {
-		Board b = new Board(3);
-		//b.setPiece(1,0,b.getGame().getQueen0());
 		
 		
-		//b.setPiece(0,2,b.getGame().getRock0());
-		//b.setPiece(7,4,b.getGame().getRock1());
-		
-		System.out.println(b.solutionSteps(b));
-		GameUI gUI = new GameUI(b);
-		gUI.launch();
-		
+		//GameUI gUI = new GameUI(b);
+		//gUI.launch();
+	
 		//test();
+		test2();
 		
 	}
 }
