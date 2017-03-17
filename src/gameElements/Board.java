@@ -30,6 +30,8 @@ public class Board {
 				board[y][x] = game.getEmpty();
 			}
 		}
+		rocksPlayer0 = size;
+		rocksPlayer1 = size;
 	}
 	
 	public Board(int s) {
@@ -43,6 +45,8 @@ public class Board {
 				board[y][x] = game.getEmpty();
 			}
 		}
+		rocksPlayer0 = size;
+		rocksPlayer1 = size;
 	}
 	
 	public Board(Board b) {
@@ -56,6 +60,8 @@ public class Board {
 				board[y][x] = b.getBoard()[y][x];
 			}
 		}
+		rocksPlayer0 = size;
+		rocksPlayer1 = size;
 	}
 	
 	public Game getGame() {
@@ -123,7 +129,6 @@ public class Board {
 	}
 	
 	public Board clone() {
-	
 		return new Board(this);
 	}
 
@@ -456,34 +461,209 @@ public class Board {
 		
 	
 	//------------TP3----------------------
-	public boolean isAccessible2(int i, int j, Player currentPlayer) {
-		// TODO Auto-generated method stub
-		return false;
+	public int rocksPlayer0;
+	public int rocksPlayer1;
+	
+	public static int queenValue = 5;
+	public static int rockValue = 2;
+	
+	// question 1.1
+	public int getRocksPlayer0() {
+		return rocksPlayer0;
+	}
+	public void setRocksPlayer0(int rocksPlayer0) {
+		this.rocksPlayer0 = rocksPlayer0;
+	}
+	public int getRocksPlayer1() {
+		return rocksPlayer1;
+	}
+	public void setRocksPlayer1(int rocksPlayer1) {
+		this.rocksPlayer1 = rocksPlayer1;
+	}
+
+	// question 1.2
+	public int getNumberOfRocksLeft(Player player) {
+		if (player.getNumber()==0) {
+			return rocksPlayer0;
+		} else {
+			return rocksPlayer1;
+		}
 	}
 	
+	public void useRock(Player player) {
+		if (player.getNumber()==0) {
+			rocksPlayer0--;
+		} else {
+			rocksPlayer1--;
+		}
+	}
+	
+	// question 1.3
+	public boolean isAccessible2(int i, int j, Player currentPlayer) {
+		if (!this.isEmpty(i, j)) {
+			return false;
+		}
+		
+		boolean resultat=true;
+		// on determine la reine adverse
+		Square reineEnnemie;
+		if(currentPlayer.getNumber()==0) {
+			reineEnnemie = this.game.getQueen1();
+		} else {
+			reineEnnemie = this.game.getQueen0();
+		}
+		
+		// tous les vecteurs
+		for (int y=-1 ; y<=1 ; y++) {
+			for (int x=-1 ; x<=1 ; x++) {
+				boolean fin=false;
+				int posX=i;
+				int posY=j;
+				while (!fin && resultat) {
+					posX = posX+x;
+					posY = posY+y;
+					if (posX<0 || posY<0 || posX>=size || posY>=size || (x==0 && y==0)) {
+						fin=true;
+					} else {
+						Square s = this.getPiece(posX,posY);
+						
+						// on regarde si la case qu'on a récupérer n'est pas occupé pas une reine ennemie
+						if(s.toString().equals(reineEnnemie.toString())) {
+							resultat=false;
+							fin=true;
+						} else if(!this.isEmpty(posX, posY)) {
+							fin=true;
+						}
+					}
+				}
+			}
+		}
+		
+		return resultat;
+	}
+	
+	// question 1.4
+	public int numberOfAccessible2(Player player) {
+		int nb=0;
+		
+		for (int y=0 ; y<size ; y++) {
+			for (int x=0 ; x<size ; x++) {
+				if (isAccessible2(x,y,player)) {
+					nb++;
+				}
+			}	
+		}
+		
+		return nb;
+	}
+	
+	// question 1.5
+	public String toStringAccess2(Player player) {
+		StringBuilder table = new StringBuilder("");
+		
+		for (int y=0 ; y<size ; y++) {
+			table.append("| ");
+			for (int x=0 ; x<size ; x++) {
+				table.append(board[y][x].toString());
+				if (!isAccessible2(x,y,player) && isEmpty(x,y)) {
+					table.append("X");
+				} else {
+					table.append(" ");
+				}
+				table.append(" | ");
+			}
+			table.append("\n");
+		}
+		return table.toString();
+	}
+	
+	// question 1.6
+	public int numberOfQueens2(Player player) {
+		int nb = 0;
+		Square reine;
+		
+		if(player.getNumber()==0) {
+			reine = this.game.getQueen0();
+		} else {
+			reine = this.game.getQueen1();
+		}
+		
+		for (int y=0 ; y<size ; y++) {
+			for (int x=0 ; x<size ; x++) {
+				Square s = this.getPiece(x,y);
+
+				if(s.toString().equals(reine.toString())) {
+					nb++;
+				}
+			}
+		}
+		
+		return nb;
+	}
+	
+	public int numberOfRocks2(Player player) {
+		int nb = 0;
+		Square rock;
+		
+		if(player.getNumber()==0) {
+			rock = this.game.getRock0();
+		} else {
+			rock = this.game.getRock1();
+		}
+		
+		for (int y=0 ; y<size ; y++) {
+			for (int x=0 ; x<size ; x++) {
+				Square s = this.getPiece(x,y);
+
+				if(s.toString().equals(rock.toString())) {
+					nb++;
+				}
+			}
+		}
+		
+		return nb;
+	}
+	
+	// question 1.7
+	public int getScore(Player player){
+		return queenValue*this.numberOfQueens2(player)+rockValue*this.numberOfRocks2(player);
+	}
 	
 	public boolean placeQueen2(int i, int j, Player player) {
-		// TODO Auto-generated method stub
+		Square reine;
+
+		if(player.getNumber()==0) {
+			reine = this.game.getQueen0();
+		} else {
+			reine = this.game.getQueen1();
+		}
+		
+		if (isAccessible2(i,j,player)) {
+			setPiece(i,j,reine);
+			return true;
+		}
+		
 		return false;
 	}
 
 	public boolean placeRock2(int i, int j, Player player) {
-		// TODO Auto-generated method stub
+		Square rocher;
+
+		if(player.getNumber()==0) {
+			rocher = this.game.getRock0();
+		} else {
+			rocher = this.game.getRock1();
+		}
+		
+		if (this.isEmpty(i, j)) {
+			setPiece(i,j,rocher);
+			useRock(player);
+			return true;
+		}
+		
 		return false;
 	}
 	
-	public int getNumberOfRocksLeft(Player player){
-		// TODO Auto-generated method stub
-		return 0;  
-	}
-	
-	public int getScore(Player player){
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-
 	//----------------------TP4&5--------------------------
 	public boolean isFinal() {
 		// TODO Auto-generated method stub
@@ -494,15 +674,4 @@ public class Board {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	
-
-
-
-
-
-	
-	
-
 }
