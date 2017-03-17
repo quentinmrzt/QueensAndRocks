@@ -655,7 +655,7 @@ public class Board {
 			rocher = this.game.getRock1();
 		}
 		
-		if (this.isEmpty(i, j)) {
+		if (this.isEmpty(i, j) && this.getNumberOfRocksLeft(player)>0) {
 			setPiece(i,j,rocher);
 			useRock(player);
 			return true;
