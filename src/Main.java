@@ -269,15 +269,180 @@ public class Main {
 		}
 	}
 	
+	public static void test4joueurVSordi() {
+		Scanner sc = new Scanner(System.in);
+		int i, j, s, profondeur = 2;
+		String p = "";
+		System.out.print("Choisissez une taille du tableau : ");
+		s = sc.nextInt();
+		Board b = new Board(s);
+		boolean fin=false;
+		Player joueur;
+		Player ordinateur;
+		int numJoueur=0;
+		
+		while(!fin) {
+
+			joueur = b.getGame().getPlayer0();
+			ordinateur = b.getGame().getPlayer1();
+
+			if(numJoueur==0) {
+				if(b.getNumberOfRocksLeft(joueur)>0 || b.numberOfAccessible2(joueur)>0) {
+					System.out.println("A votre tour:");
+					System.out.println("Nombre de rocher restante: "+b.getNumberOfRocksLeft(joueur)+"\n");
+					System.out.println("Votre score: "+b.getScore(joueur)+", Ordinateur: "+b.getScore(ordinateur));
+					
+					System.out.println(b.toStringAccess2(joueur)+"\n");
+					p="";
+					
+					if(joueur.getNumber()==0 && b.getNumberOfRocksLeft(joueur)==b.getSize()) {
+						System.out.println("Vous devez obligatoirement placer un rocher en tant que premier joueur.");
+						p = "r";
+					}
+					
+					while(!p.equals("d") && !p.equals("r")){
+						
+						System.out.println("Quelle pièce voulez-vous placer ?");
+						System.out.print("Pièce (d/r): ");
+						p = sc.next();
+						
+						if (p.equals("d")) {
+							if(b.numberOfAccessible2(joueur)==0) {
+								System.out.println("Il n'y a plus de case accessible !");
+								p="";
+							}
+						} else if (p.equals("r")){
+							if(b.getNumberOfRocksLeft(joueur)==0) {
+								System.out.println("Tu n'as pas de rocher !");
+								p="";
+							}
+						} else {
+							System.out.println("Caractère invalide, recommence.");
+						}
+						
+					}
+					
+					boolean place=false;
+					while(!place) {
+						System.out.println("Ou voulez vous placez votre pièce ?");
+						System.out.print("Rentrez x: ");
+						i = sc.nextInt();
+						System.out.print("Rentrez y: ");
+						j = sc.nextInt();
+						
+						if(p.equals("d")){
+							if(!b.placeQueen2(i,j,joueur)) {
+								System.err.println("Cases inacessible !");
+							} else {
+								System.out.println("La reine a bien été placée.\n");
+								place=true;
+							}
+						} else {
+							if(!b.placeRock2(i,j,joueur)) {
+								System.err.println("Cases inacessible !");
+							} else {
+								System.out.println("Le rocher a bien été placé\n");
+								place=true;
+							}
+						}
+					}
+				}
+				
+				numJoueur=1;
+			} else {
+				Eval eval = new Eval0();
+				b = new Board(b.minimax(b, ordinateur, profondeur, eval));
+				numJoueur=0;
+			}
+			
+			if ((b.getNumberOfRocksLeft(joueur)<=0 && b.numberOfAccessible2(joueur)<=0)
+			 || (b.getNumberOfRocksLeft(ordinateur)<=0 && b.numberOfAccessible2(ordinateur)<=0)) {
+				fin=true;
+			}
+		}
+		
+		System.out.println(b.toString());
+		int score0=b.getScore(b.getGame().getPlayer0());
+		int score1=b.getScore(b.getGame().getPlayer1());
+		System.out.println("Score joueur: "+score0+" et score ordinateur: "+score1);
+		if(score0>score1) {
+			System.out.println("Bravo tu as gagné !");
+		} else if (score0<score1){
+			System.out.println("Dommage tu as perdu !");
+		} else {
+			System.out.println("ex aequo !");
+		}
+	}
+	
+	public static void test4ordiVSordi(int s, int profondeur) {
+		Board b = new Board(s);
+		boolean fin=false;
+		Player ordinateur0;
+		Player ordinateur1;
+		int numJoueur=0;
+
+		Date date = new Date();
+		Eval eval = new Eval0();
+		
+		while(!fin) {
+			ordinateur0 = b.getGame().getPlayer0();
+			ordinateur1 = b.getGame().getPlayer1();
+
+			if (numJoueur==0) {
+				//System.out.println("Ordinateur0:");
+				//System.out.println(b.toStringAccess2(ordinateur0));;
+				b = b.minimax(b, ordinateur0, profondeur, eval);
+				numJoueur=1;
+			} else {
+				//System.out.println("Ordinateur1:");
+				//System.out.println(b.toStringAccess2(ordinateur1));
+				b = b.minimax(b, ordinateur1, profondeur, eval);
+				numJoueur=0;
+			}
+			
+			if (b.isFinal()) {
+				fin=true;
+			}
+		}
+		
+		Date date2 = new Date();
+		
+		//System.out.println(b.toString());
+		
+		int score0=b.getScore(b.getGame().getPlayer0());
+		int score1=b.getScore(b.getGame().getPlayer1());
+		System.out.println("Score ordinateur0: "+score0+" et score ordinateur1: "+score1);
+		if(score0>score1) {
+			System.out.println("Victoire ordinateur0 !");
+		} else if (score0<score1){
+			System.out.println("Victoire ordinateur1 !");
+		} else {
+			System.out.println("Ex aequo !");
+		}
+		float diff = date2.getTime()-date.getTime();
+		System.out.println("Temps: "+diff+" ms");
+	}
+	
+	public static void test4multiple() {
+		for(int i=0 ; i<5 ; i++) {
+			test4ordiVSordi(6,2);	
+		}
+	}
+	
 	public static void main(String[] args) {
 		
-		Board b = new Board();
+		/*Board b = new Board(4);
 		GameUI gUI = new GameUI(b);
-		gUI.launch();
+		gUI.setMinimaxDepth(3);
+		gUI.launch();*/
 	
 		//test();
 		//test2();
 		//test3();
-		test3rocher();
+		//test3rocher();
+		//test4joueurVSordi();
+		//test4joueurVSordi();
+		//test4ordiVSordi(4);
+		test4multiple();
 	}
 }

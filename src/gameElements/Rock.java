@@ -5,9 +5,9 @@ public class Rock implements Square {
 
 	public String toString() {
 		if (player.getNumber()==0) {
-			return "@";
+			return "R0";
 		} else {
-			return "#";
+			return "R1";
 		}	}
 
 	public Player getPlayer() {

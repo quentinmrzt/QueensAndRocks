@@ -5,9 +5,9 @@ public class Queen implements Square {
 	
 	public String toString() {
 		if (player.getNumber()==0) {
-			return "W";
+			return "D0";
 		} else {
-			return "B";
+			return "D1";
 		}
 	}
 

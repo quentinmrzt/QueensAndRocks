@@ -60,8 +60,8 @@ public class Board {
 				board[y][x] = b.getBoard()[y][x];
 			}
 		}
-		rocksPlayer0 = size;
-		rocksPlayer1 = size;
+		rocksPlayer0 = b.getRocksPlayer0();
+		rocksPlayer1 = b.getRocksPlayer1();
 	}
 	
 	public Game getGame() {
@@ -116,12 +116,16 @@ public class Board {
 	
 	public String toString() {
 		StringBuilder table = new StringBuilder();
-		table.append("W: Dame 0   B: Dame 1\n#: Rochet 0   @: Rochet 1\n");
+		table.append("D0: Dame 0   D1: Dame 1\nR0: Rochet 0   R1: Rochet 1\n");
 		
 		for (int y=0 ; y<size ; y++) {
 			table.append("| ");
 			for (int x=0 ; x<size ; x++) {
-				table.append(board[y][x].toString()+"  | ");
+				if (isEmpty(x,y)) {
+					table.append(board[y][x].toString()+"   | ");
+				} else {
+					table.append(board[y][x].toString()+"  | ");
+				}
 			}
 			table.append("\n");
 		}
@@ -169,8 +173,10 @@ public class Board {
 			for (int x=0 ; x<size ; x++) {
 				table.append(board[y][x].toString());
 				if (!isAccessible(x,y) && isEmpty(x,y)) {
-					table.append("X");
-				}else{
+					table.append("X ");
+				}else if(isEmpty(x,y)){
+					table.append("  ");
+				}else {
 					table.append(" ");
 				}
 				table.append(" | ");
@@ -566,8 +572,10 @@ public class Board {
 			for (int x=0 ; x<size ; x++) {
 				table.append(board[y][x].toString());
 				if (!isAccessible2(x,y,player) && isEmpty(x,y)) {
-					table.append("X");
-				} else {
+					table.append("X ");
+				} else if(isEmpty(x,y)){
+					table.append("  ");
+				}else{
 					table.append(" ");
 				}
 				table.append(" | ");
@@ -665,13 +673,109 @@ public class Board {
 	}
 	
 	//----------------------TP4&5--------------------------
+	
+	// question 1.3
 	public boolean isFinal() {
-		// TODO Auto-generated method stub
-		return false;
+		int nombreRocher0 = this.getNumberOfRocksLeft(this.getGame().getPlayer0());
+		int nombreRocher1 = this.getNumberOfRocksLeft(this.getGame().getPlayer1());
+		int nombreAccesible0 = this.numberOfAccessible2(this.getGame().getPlayer0());
+		int nombreAccesible1 =this.numberOfAccessible2(this.getGame().getPlayer1());
+		
+		return (nombreRocher0==0 && nombreAccesible0==0) || (nombreRocher1==0 && nombreAccesible1==0);
+	}
+	
+	
+	// question 1.4
+	public ArrayList<Board> getSuccessors2(Player player) {
+		ArrayList<Board> lb = new ArrayList<Board>();
+				
+		for (int y=0 ; y<size ; y++) {
+			for (int x=0 ; x<size ; x++) {	
+				// place une reine
+				if (isAccessible2(x,y,player)) {
+					Board b = this.clone();
+					b.placeQueen2(x, y, player);
+					lb.add(b);
+				}
+				
+				// place un rocher
+				if (this.isEmpty(x, y) && getNumberOfRocksLeft(player)>0) {
+					Board b = this.clone();
+					b.placeRock2(x, y, player);
+					lb.add(b);
+				}
+			}
+		}
+				
+		return lb;
 	}
 
-	public Board minimax(Board b, Player currentPlayer, int minimaxDepth, Eval evaluation) {
-		// TODO Auto-generated method stub
-		return null;
+	// question 1.5
+	public Board minimax(Board b,Player currentPlayer, int minimaxDepth, Eval evaluation) {
+		ArrayList<Board> lb = getSuccessors2(currentPlayer);
+
+		float score;
+		float scoreMax = Float.NEGATIVE_INFINITY;
+		// plateau vide si plus successeur
+		Board sortie = new Board(size);
+		
+		if(b.isFinal()){
+			return b;
+		}
+		
+		for(Board s: lb) {
+			score = evaluation(s,currentPlayer, minimaxDepth,evaluation,currentPlayer);
+			if(score >= scoreMax){
+				sortie = s;
+				scoreMax = score;
+			}
+		}
+		
+		return sortie;
+	}
+
+
+	public float evaluation(Board b, Player player, int c, Eval e, Player playing) {
+		float resultat = e.getEval(player,b);
+		float score_min,score_max;
+		
+		// on cherche l'adversaire
+		Player adversaire;
+		if (playing.getNumber()==0) {
+			adversaire = b.getGame().getPlayer1();
+		} else {
+			adversaire = b.getGame().getPlayer0();
+		}
+		
+		if(b.isFinal()){
+			if(resultat==0) {
+				return 0;
+			} else if (resultat>0) {
+				return Float.POSITIVE_INFINITY;
+			} else {
+				return Float.NEGATIVE_INFINITY;
+			}
+		}
+		
+		if(c==0) {
+			return resultat; 
+		}
+		
+		ArrayList<Board> lb = b.getSuccessors2(playing);
+		if(player.getNumber()==playing.getNumber()){
+			score_max = Float.NEGATIVE_INFINITY;
+			
+			for(Board s : lb){
+				score_max = Math.max(score_max,evaluation(s,player,c-1,e,adversaire));
+			}
+			
+			return score_max;
+		} else {
+			score_min = Float.POSITIVE_INFINITY;
+			for(Board s : lb){
+				score_min = Math.min(score_min,evaluation(s,player,c-1,e,adversaire));
+			}
+			return score_min;
+		}
 	}
 }
