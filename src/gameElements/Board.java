@@ -32,6 +32,7 @@ public class Board {
 		}
 		rocksPlayer0 = size;
 		rocksPlayer1 = size;
+		regleRocher = false;
 	}
 	
 	public Board(int s) {
@@ -47,6 +48,7 @@ public class Board {
 		}
 		rocksPlayer0 = size;
 		rocksPlayer1 = size;
+		regleRocher = false;
 	}
 	
 	public Board(Board b) {
@@ -62,6 +64,7 @@ public class Board {
 		}
 		rocksPlayer0 = b.getRocksPlayer0();
 		rocksPlayer1 = b.getRocksPlayer1();
+		regleRocher = b.getRegleRocher();
 	}
 	
 	public Game getGame() {
@@ -470,7 +473,7 @@ public class Board {
 	public int rocksPlayer0;
 	public int rocksPlayer1;
 	
-	public static int queenValue = 5;
+	public static int queenValue = 500;
 	public static int rockValue = 2;
 	
 	// question 1.1
@@ -674,6 +677,16 @@ public class Board {
 	
 	//----------------------TP4&5--------------------------
 	
+	private boolean regleRocher;
+	
+	public boolean getRegleRocher() {
+		return regleRocher;
+	}
+
+	public void setRegleRocher(boolean regleRocher) {
+		this.regleRocher = regleRocher;
+	}
+
 	// question 1.3
 	public boolean isFinal() {
 		int nombreRocher0 = this.getNumberOfRocksLeft(this.getGame().getPlayer0());
@@ -690,9 +703,10 @@ public class Board {
 		ArrayList<Board> lb = new ArrayList<Board>();
 				
 		for (int y=0 ; y<size ; y++) {
-			for (int x=0 ; x<size ; x++) {	
+			for (int x=0 ; x<size ; x++) {
+				
 				// place une reine
-				if (isAccessible2(x,y,player)) {
+				if (isAccessible2(x,y,player) && !this.getRegleRocher()) {
 					Board b = this.clone();
 					b.placeQueen2(x, y, player);
 					lb.add(b);
@@ -706,10 +720,12 @@ public class Board {
 				}
 			}
 		}
+		
+		this.setRegleRocher(false);
 				
 		return lb;
 	}
-
+	
 	// question 1.5
 	public Board minimax(Board b,Player currentPlayer, int minimaxDepth, Eval evaluation) {
 		ArrayList<Board> lb = getSuccessors2(currentPlayer);
@@ -717,7 +733,7 @@ public class Board {
 		float score;
 		float scoreMax = Float.NEGATIVE_INFINITY;
 		// plateau vide si plus successeur
-		Board sortie = new Board(size);
+		Board sortie = new Board(b.size);
 		
 		if(b.isFinal()){
 			return b;
@@ -725,12 +741,14 @@ public class Board {
 		
 		for(Board s: lb) {
 			score = evaluation(s,currentPlayer, minimaxDepth,evaluation,currentPlayer);
+			System.out.println("score: "+score);
 			if(score >= scoreMax){
 				sortie = s;
 				scoreMax = score;
+				System.out.println();
 			}
 		}
-		
+		System.out.println("");
 		return sortie;
 	}
 
@@ -772,9 +790,11 @@ public class Board {
 			return score_max;
 		} else {
 			score_min = Float.POSITIVE_INFINITY;
+			
 			for(Board s : lb){
 				score_min = Math.min(score_min,evaluation(s,player,c-1,e,adversaire));
 			}
+			
 			return score_min;
 		}
 	}

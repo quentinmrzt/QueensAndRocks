@@ -374,7 +374,7 @@ public class Main {
 		}
 	}
 	
-	public static void test4ordiVSordi(int s, int profondeur) {
+	public static int test4ordiVSordi(int s, int profondeur0, int profondeur1, boolean rocher) {
 		Board b = new Board(s);
 		boolean fin=false;
 		Player ordinateur0;
@@ -384,19 +384,21 @@ public class Main {
 		Date date = new Date();
 		Eval eval = new Eval0();
 		
+		b.setRegleRocher(rocher);
+		
 		while(!fin) {
 			ordinateur0 = b.getGame().getPlayer0();
 			ordinateur1 = b.getGame().getPlayer1();
 
 			if (numJoueur==0) {
-				//System.out.println("Ordinateur0:");
-				//System.out.println(b.toStringAccess2(ordinateur0));;
-				b = b.minimax(b, ordinateur0, profondeur, eval);
+				System.out.println("Ordinateur0:");
+				System.out.println(b.toStringAccess2(ordinateur0));;
+				b = b.minimax(b, ordinateur0, profondeur0, eval);
 				numJoueur=1;
 			} else {
-				//System.out.println("Ordinateur1:");
-				//System.out.println(b.toStringAccess2(ordinateur1));
-				b = b.minimax(b, ordinateur1, profondeur, eval);
+				System.out.println("Ordinateur1:");
+				System.out.println(b.toStringAccess2(ordinateur1));
+				b = b.minimax(b, ordinateur1, profondeur1, eval);
 				numJoueur=0;
 			}
 			
@@ -407,42 +409,56 @@ public class Main {
 		
 		Date date2 = new Date();
 		
-		//System.out.println(b.toString());
+		System.out.println(b.toString());
+		float diff = date2.getTime()-date.getTime();
+		System.out.println("Temps: "+diff+" ms");
 		
 		int score0=b.getScore(b.getGame().getPlayer0());
 		int score1=b.getScore(b.getGame().getPlayer1());
 		System.out.println("Score ordinateur0: "+score0+" et score ordinateur1: "+score1);
 		if(score0>score1) {
 			System.out.println("Victoire ordinateur0 !");
+			return 0;
 		} else if (score0<score1){
 			System.out.println("Victoire ordinateur1 !");
+			return 1;
 		} else {
 			System.out.println("Ex aequo !");
+			return 2;
 		}
-		float diff = date2.getTime()-date.getTime();
-		System.out.println("Temps: "+diff+" ms");
 	}
 	
-	public static void test4multiple() {
-		for(int i=0 ; i<5 ; i++) {
-			test4ordiVSordi(6,2);	
+	public static void test4multiple(int nb) {
+		int nbOrdi0=0, nbOrdi1=0, nbEgalite=0;
+		for(int i=0 ; i<nb ; i++) {
+			int resultat = test4ordiVSordi(4,2,2,true);
+			if(resultat==0) {
+				nbOrdi0++;
+			} else if(resultat==1) {
+				nbOrdi1++;
+			} else {
+				nbEgalite++;
+			}
 		}
+		System.out.println("\nFin, resultat sur "+nb+" partie(s):\nOrdi0: "+nbOrdi0+"\nOrdi1: "+nbOrdi1+"\nEgalite: "+nbEgalite);
 	}
+	
 	
 	public static void main(String[] args) {
 		
-		/*Board b = new Board(4);
+		Board b = new Board(4);
 		GameUI gUI = new GameUI(b);
-		gUI.setMinimaxDepth(3);
-		gUI.launch();*/
-	
+		gUI.setMinimaxDepth(2);
+		gUI.launch();
+		
 		//test();
 		//test2();
 		//test3();
 		//test3rocher();
 		//test4joueurVSordi();
 		//test4joueurVSordi();
-		//test4ordiVSordi(4);
-		test4multiple();
+		//test4ordiVSordi(4,2);
+		//test4multiple(1);
+		//test4ordiVSordiRocher(4,2);
 	}
 }
