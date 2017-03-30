@@ -11,6 +11,7 @@ public class Eval0 implements Eval {
 		} else {
 			scoreAdversaire = b.getScore(b.getGame().getPlayer0());
 		}
+		
 		return b.getScore(player)-scoreAdversaire;
 	}
 

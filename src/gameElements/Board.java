@@ -32,7 +32,7 @@ public class Board {
 		}
 		rocksPlayer0 = size;
 		rocksPlayer1 = size;
-		regleRocher = false;
+		regleRocher = true;
 	}
 	
 	public Board(int s) {
@@ -48,7 +48,7 @@ public class Board {
 		}
 		rocksPlayer0 = size;
 		rocksPlayer1 = size;
-		regleRocher = false;
+		regleRocher = true;
 	}
 	
 	public Board(Board b) {
@@ -700,8 +700,7 @@ public class Board {
 	
 	// question 1.4
 	public ArrayList<Board> getSuccessors2(Player player) {
-		ArrayList<Board> lb = new ArrayList<Board>();
-				
+		ArrayList<Board> lb = new ArrayList<Board>();	
 		for (int y=0 ; y<size ; y++) {
 			for (int x=0 ; x<size ; x++) {
 				
@@ -715,21 +714,18 @@ public class Board {
 				// place un rocher
 				if (this.isEmpty(x, y) && getNumberOfRocksLeft(player)>0) {
 					Board b = this.clone();
+					b.setRegleRocher(false);
 					b.placeRock2(x, y, player);
 					lb.add(b);
 				}
 			}
 		}
-		
-		this.setRegleRocher(false);
-				
 		return lb;
 	}
 	
 	// question 1.5
 	public Board minimax(Board b,Player currentPlayer, int minimaxDepth, Eval evaluation) {
-		ArrayList<Board> lb = getSuccessors2(currentPlayer);
-
+		ArrayList<Board> lb = b.getSuccessors2(currentPlayer);
 		float score;
 		float scoreMax = Float.NEGATIVE_INFINITY;
 		// plateau vide si plus successeur
@@ -741,14 +737,13 @@ public class Board {
 		
 		for(Board s: lb) {
 			score = evaluation(s,currentPlayer, minimaxDepth,evaluation,currentPlayer);
-			System.out.println("score: "+score);
+
 			if(score >= scoreMax){
 				sortie = s;
 				scoreMax = score;
-				System.out.println();
 			}
 		}
-		System.out.println("");
+		
 		return sortie;
 	}
 
@@ -774,8 +769,9 @@ public class Board {
 				return Float.NEGATIVE_INFINITY;
 			}
 		}
-		
+
 		if(c==0) {
+			
 			return resultat; 
 		}
 		

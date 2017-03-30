@@ -269,9 +269,9 @@ public class Main {
 		}
 	}
 	
-	public static void test4joueurVSordi() {
+	public static void test4joueurVSordi(int profondeur, Eval e) {
 		Scanner sc = new Scanner(System.in);
-		int i, j, s, profondeur = 2;
+		int i, j, s;
 		String p = "";
 		System.out.print("Choisissez une taille du tableau : ");
 		s = sc.nextInt();
@@ -350,7 +350,7 @@ public class Main {
 				
 				numJoueur=1;
 			} else {
-				Eval eval = new Eval0();
+				Eval eval = e;
 				b = new Board(b.minimax(b, ordinateur, profondeur, eval));
 				numJoueur=0;
 			}
@@ -374,7 +374,7 @@ public class Main {
 		}
 	}
 	
-	public static int test4ordiVSordi(int s, int profondeur0, int profondeur1, boolean rocher) {
+	public static int test4ordiVSordi(int s, int profondeur0, int profondeur1, boolean rocher, Eval e0, Eval e1) {
 		Board b = new Board(s);
 		boolean fin=false;
 		Player ordinateur0;
@@ -382,7 +382,7 @@ public class Main {
 		int numJoueur=0;
 
 		Date date = new Date();
-		Eval eval = new Eval0();
+
 		
 		b.setRegleRocher(rocher);
 		
@@ -393,12 +393,12 @@ public class Main {
 			if (numJoueur==0) {
 				System.out.println("Ordinateur0:");
 				System.out.println(b.toStringAccess2(ordinateur0));;
-				b = b.minimax(b, ordinateur0, profondeur0, eval);
+				b = b.minimax(b, ordinateur0, profondeur0, e0);
 				numJoueur=1;
 			} else {
 				System.out.println("Ordinateur1:");
 				System.out.println(b.toStringAccess2(ordinateur1));
-				b = b.minimax(b, ordinateur1, profondeur1, eval);
+				b = b.minimax(b, ordinateur1, profondeur1, e1);
 				numJoueur=0;
 			}
 			
@@ -428,10 +428,10 @@ public class Main {
 		}
 	}
 	
-	public static void test4multiple(int nb) {
+	public static void test4multiple(int nb, Eval e) {
 		int nbOrdi0=0, nbOrdi1=0, nbEgalite=0;
 		for(int i=0 ; i<nb ; i++) {
-			int resultat = test4ordiVSordi(4,2,2,true);
+			int resultat = test4ordiVSordi(4,2,2,true,e,e);
 			if(resultat==0) {
 				nbOrdi0++;
 			} else if(resultat==1) {
@@ -443,22 +443,49 @@ public class Main {
 		System.out.println("\nFin, resultat sur "+nb+" partie(s):\nOrdi0: "+nbOrdi0+"\nOrdi1: "+nbOrdi1+"\nEgalite: "+nbEgalite);
 	}
 	
+	public static float optimisation() {
+		EvalLambda evalLambda = new EvalLambda();
+		
+		int gg;
+		
+		EvalLambda evalLambdaPrime = new EvalLambda();
+		evalLambdaPrime.setLambda(evalLambda.getLambda()+ 0.01f);
+		
+		while((evalLambdaPrime.getLambda() - evalLambda.getLambda()) <= 0.1f){
+			System.out.println("-----------------------------------------------------"+evalLambda.getLambda()+" "+evalLambdaPrime.getLambda());
+			gg = test4ordiVSordi(4, 3, 3, true, evalLambda, evalLambdaPrime);
+			if(gg==0){
+				evalLambdaPrime.setLambda(evalLambdaPrime.getLambda()+0.01f);
+			}else{
+				evalLambda.setLambda(evalLambdaPrime.getLambda());
+			}
+			
+		}
+		
+		return evalLambda.getLambda();
+	}
 	
 	public static void main(String[] args) {
 		
-		Board b = new Board(4);
+		
+		//System.out.println(optimisation());
+		Board b = new Board(5);
+		Eval eval = new Eval1();
+		
+		
 		GameUI gUI = new GameUI(b);
 		gUI.setMinimaxDepth(2);
+		gUI.setEvaluation(eval);
 		gUI.launch();
 		
 		//test();
 		//test2();
 		//test3();
 		//test3rocher();
-		//test4joueurVSordi();
-		//test4joueurVSordi();
-		//test4ordiVSordi(4,2);
-		//test4multiple(1);
+		//test4joueurVSordi(2, eval);
+		//test4ordiVSordi(5, 2, 2, true, eval, eval);
+		//test4multiple(1, eval);
 		//test4ordiVSordiRocher(4,2);
+		
 	}
 }
