@@ -451,41 +451,44 @@ public class Main {
 		EvalLambda evalLambdaPrime = new EvalLambda();
 		evalLambdaPrime.setLambda(evalLambda.getLambda()+ 0.01f);
 		
-		while((evalLambdaPrime.getLambda() - evalLambda.getLambda()) <= 0.1f){
-			System.out.println("-----------------------------------------------------"+evalLambda.getLambda()+" "+evalLambdaPrime.getLambda());
-			gg = test4ordiVSordi(4, 3, 3, true, evalLambda, evalLambdaPrime);
-			if(gg==0){
-				evalLambdaPrime.setLambda(evalLambdaPrime.getLambda()+0.01f);
-			}else{
+		while((evalLambdaPrime.getLambda() - evalLambda.getLambda()) <= 0.1f && evalLambdaPrime.getLambda()<1){
+			System.out.println("Lambda: "+evalLambda.getLambda()+" et lambda prime: "+evalLambdaPrime.getLambda());
+			gg = test4ordiVSordi(4, 2, 2, true, evalLambda, evalLambdaPrime);
+			
+			if (gg==1) {
 				evalLambda.setLambda(evalLambdaPrime.getLambda());
 			}
-			
+
+			evalLambdaPrime.setLambda(evalLambdaPrime.getLambda()+0.01f);
 		}
 		
 		return evalLambda.getLambda();
 	}
 	
+	
+	
 	public static void main(String[] args) {
-		
-		
 		//System.out.println(optimisation());
-		Board b = new Board(5);
 		Eval eval = new Eval1();
 		
-		
+		/*
 		GameUI gUI = new GameUI(b);
 		gUI.setMinimaxDepth(2);
 		gUI.setEvaluation(eval);
 		gUI.launch();
-		
+		*/
 		//test();
 		//test2();
 		//test3();
 		//test3rocher();
 		//test4joueurVSordi(2, eval);
-		//test4ordiVSordi(5, 2, 2, true, eval, eval);
+		test4ordiVSordi(4, 2, 2, true, eval, eval);
 		//test4multiple(1, eval);
 		//test4ordiVSordiRocher(4,2);
+		//optimisation();
 		
+		
+		// pour 100 parties, le temps est extremement long
+		//Eval eval = new Eval2();
 	}
 }

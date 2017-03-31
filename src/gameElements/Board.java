@@ -473,7 +473,7 @@ public class Board {
 	public int rocksPlayer0;
 	public int rocksPlayer1;
 	
-	public static int queenValue = 500;
+	public static int queenValue = 5;
 	public static int rockValue = 2;
 	
 	// question 1.1
@@ -693,14 +693,16 @@ public class Board {
 		int nombreRocher1 = this.getNumberOfRocksLeft(this.getGame().getPlayer1());
 		int nombreAccesible0 = this.numberOfAccessible2(this.getGame().getPlayer0());
 		int nombreAccesible1 =this.numberOfAccessible2(this.getGame().getPlayer1());
-		
-		return (nombreRocher0==0 && nombreAccesible0==0) || (nombreRocher1==0 && nombreAccesible1==0);
+		boolean placeLibre = this.getNumberOfPieces() != (this.size*this.size);
+				
+		return (nombreRocher0==0 && nombreAccesible0==0) || (nombreRocher1==0 && nombreAccesible1==0) || !placeLibre;
 	}
 	
 	
 	// question 1.4
 	public ArrayList<Board> getSuccessors2(Player player) {
 		ArrayList<Board> lb = new ArrayList<Board>();	
+		
 		for (int y=0 ; y<size ; y++) {
 			for (int x=0 ; x<size ; x++) {
 				
@@ -728,15 +730,24 @@ public class Board {
 		ArrayList<Board> lb = b.getSuccessors2(currentPlayer);
 		float score;
 		float scoreMax = Float.NEGATIVE_INFINITY;
+		
 		// plateau vide si plus successeur
 		Board sortie = new Board(b.size);
+		
+		// on cherche l'adversaire
+		Player adversaire;
+		if (currentPlayer.getNumber()==0) {
+			adversaire = b.getGame().getPlayer1();
+		} else {
+			adversaire = b.getGame().getPlayer0();
+		}
 		
 		if(b.isFinal()){
 			return b;
 		}
 		
 		for(Board s: lb) {
-			score = evaluation(s,currentPlayer, minimaxDepth,evaluation,currentPlayer);
+			score = evaluation(s,currentPlayer, minimaxDepth,evaluation,adversaire);
 
 			if(score >= scoreMax){
 				sortie = s;
@@ -750,7 +761,7 @@ public class Board {
 
 	public float evaluation(Board b, Player player, int c, Eval e, Player playing) {
 		float resultat = e.getEval(player,b);
-		float score_min,score_max;
+		float score_min, score_max;
 		
 		// on cherche l'adversaire
 		Player adversaire;
@@ -760,10 +771,10 @@ public class Board {
 			adversaire = b.getGame().getPlayer0();
 		}
 		
-		if(b.isFinal()){
-			if(resultat==0) {
+		if(b.isFinal()) {
+			if(b.getScore(player)==b.getScore(adversaire)) {
 				return 0;
-			} else if (resultat>0) {
+			} else if (b.getScore(player)>b.getScore(adversaire)) {
 				return Float.POSITIVE_INFINITY;
 			} else {
 				return Float.NEGATIVE_INFINITY;
@@ -771,7 +782,6 @@ public class Board {
 		}
 
 		if(c==0) {
-			
 			return resultat; 
 		}
 		
